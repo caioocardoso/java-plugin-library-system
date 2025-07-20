@@ -1,0 +1,6 @@
+/home/caioo/java-plugin-library-system/microkernel/interfaces/src/main/java/br/edu/ifba/inf008/interfaces/IPluginController.java
+/home/caioo/java-plugin-library-system/microkernel/interfaces/src/main/java/br/edu/ifba/inf008/interfaces/IPlugin.java
+/home/caioo/java-plugin-library-system/microkernel/interfaces/src/main/java/br/edu/ifba/inf008/interfaces/IIOController.java
+/home/caioo/java-plugin-library-system/microkernel/interfaces/src/main/java/br/edu/ifba/inf008/interfaces/ICore.java
+/home/caioo/java-plugin-library-system/microkernel/interfaces/src/main/java/br/edu/ifba/inf008/interfaces/IAuthenticationController.java
+/home/caioo/java-plugin-library-system/microkernel/interfaces/src/main/java/br/edu/ifba/inf008/interfaces/IUIController.java
