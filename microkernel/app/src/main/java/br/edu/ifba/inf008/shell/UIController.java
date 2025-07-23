@@ -16,9 +16,11 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.Tab;
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.layout.Priority;
+import javafx.scene.control.Label;
 
-public class UIController extends Application implements IUIController
-{
+public class UIController extends Application implements IUIController {
+
     private ICore core;
     private MenuBar menuBar;
     private TabPane tabPane;
@@ -38,7 +40,7 @@ public class UIController extends Application implements IUIController
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("Library Management System");
 
         menuBar = new MenuBar();
 
@@ -46,6 +48,20 @@ public class UIController extends Application implements IUIController
 
         tabPane = new TabPane();
         tabPane.setSide(Side.BOTTOM);
+
+        Label welcomeLabel = new Label("Welcome");
+        welcomeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
+        VBox homePane = new VBox(welcomeLabel);
+        homePane.setAlignment(javafx.geometry.Pos.CENTER);
+
+        VBox.setVgrow(tabPane, Priority.ALWAYS);
+
+        Tab homeTab = new Tab("Home");
+        homeTab.setContent(homePane);
+        homeTab.setClosable(false);
+
+        tabPane.getTabs().add(homeTab);
 
         vBox.getChildren().addAll(tabPane);
 

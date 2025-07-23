@@ -1,4 +1,4 @@
-package br.edu.ifba.inf008.domain.data;
+package br.edu.ifba.inf008.shell.data;
 
 import java.sql.DriverManager;
 import java.sql.Connection;
