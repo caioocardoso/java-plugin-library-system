@@ -10,20 +10,16 @@ import javafx.event.ActionEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 
-public class MyPlugin implements IPlugin
-{
+public class MyPlugin implements IPlugin {
     public boolean init() {
         IUIController uiController = ICore.getInstance().getUIController();
 
-        MenuItem menuItem = uiController.createMenuItem("Menu 1", "My Menu Item");
-        menuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                System.out.println("I've been clicked!");
-            }
+        MenuItem menuItem = uiController.createMenuItem("Menu", "Book");
+        menuItem.setOnAction(e -> {
+            uiController.createTab("Book", new Rectangle(200, 200, Color.LIGHTSTEELBLUE));
         });
 
-        uiController.createTab("new tab", new Rectangle(200,200, Color.LIGHTSTEELBLUE));
+        // uiController.addQuickAccessButton("Manage Books", () -> showUserManagementTab());
 
         return true;
     }

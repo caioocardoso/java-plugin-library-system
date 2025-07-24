@@ -18,12 +18,18 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.geometry.Pos;
 
 public class UIController extends Application implements IUIController {
 
     private ICore core;
     private MenuBar menuBar;
     private TabPane tabPane;
+    private HBox quickAccessBox;
     private static UIController uiController;
 
     public UIController() {
@@ -49,13 +55,32 @@ public class UIController extends Application implements IUIController {
         tabPane = new TabPane();
         tabPane.setSide(Side.BOTTOM);
 
-        Label welcomeLabel = new Label("Welcome");
-        welcomeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        Image logoImage = new Image(UIController.class.getResourceAsStream("/images/logo.png"));
+        ImageView logoView = new ImageView(logoImage);
+        logoView.setFitWidth(200);
+        logoView.setPreserveRatio(true);
 
-        VBox homePane = new VBox(welcomeLabel);
-        homePane.setAlignment(javafx.geometry.Pos.CENTER);
+        Label welcomeLabel = new Label("Library Management System");
+        welcomeLabel.getStyleClass().add("welcome-label");
+
+        Label subtitleLabel = new Label("Your central hub for managing users, books, and loans.");
+        subtitleLabel.getStyleClass().add("home-subtitle");
+
+        Button manageUsersBtn = new Button("Manage Users");
+        manageUsersBtn.getStyleClass().add("quick-button");
+
+        Button manageBooksBtn = new Button("Manage Books");
+        manageBooksBtn.getStyleClass().add("quick-button");
+
+        quickAccessBox = new HBox(15);
+        quickAccessBox.setAlignment(Pos.CENTER);
+
+        VBox homePane = new VBox(15, logoView, welcomeLabel, subtitleLabel, quickAccessBox);
+        homePane.setAlignment(Pos.CENTER);
+        homePane.setId("home-pane");
 
         VBox.setVgrow(tabPane, Priority.ALWAYS);
+        
 
         Tab homeTab = new Tab("Home");
         homeTab.setContent(homePane);
@@ -67,6 +92,8 @@ public class UIController extends Application implements IUIController {
 
         Scene scene = new Scene(vBox, 960, 600);
 
+        scene.getStylesheets().add(UIController.class.getResource("/css/style.css").toExternalForm());
+
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -77,7 +104,7 @@ public class UIController extends Application implements IUIController {
         // Criar o menu caso ele nao exista
         Menu newMenu = null;
         for (Menu menu : menuBar.getMenus()) {
-            if (menu.getText() == menuText) {
+            if (menuText.equals(menu.getText())) {
                 newMenu = menu;
                 break;
             }
@@ -101,5 +128,14 @@ public class UIController extends Application implements IUIController {
         tabPane.getTabs().add(tab);
 
         return true;
+    }
+
+    @Override
+    public Button addQuickAccessButton(String text, Runnable action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("quick-button");
+        button.setOnAction(e -> action.run());
+        quickAccessBox.getChildren().add(button);
+        return button;
     }
 }
