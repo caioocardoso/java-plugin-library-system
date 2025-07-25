@@ -24,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.geometry.Pos;
 
 public class UserManagementPlugin implements IPlugin {
     private final UserDAO userDAO = new UserDAOImpl();
@@ -108,7 +109,7 @@ public class UserManagementPlugin implements IPlugin {
 
         HBox topBar = new HBox(10, new Label("Search:"), searchField, deleteButton);
         topBar.setPadding(new Insets(0, 0, 10, 0));
-        topBar.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        topBar.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
         VBox mainPane = new VBox(15, topBar, userTable, formPane);

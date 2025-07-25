@@ -13,6 +13,7 @@
         <module>app</module>
         <module>plugins/bookManagement</module>
         <module>plugins/userManagement</module>
+        <module>plugins/loanManagement</module>
     </modules>
 
     <properties>

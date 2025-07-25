@@ -1,6 +1,7 @@
 package br.edu.ifba.inf008.shell.model;
 
 public class Book {
+
     private int bookId;
     private String title;
     private String author;
@@ -54,5 +55,10 @@ public class Book {
 
     public void setCopies(int copies) {
         this.copies = copies;
+    }
+
+    @Override
+    public String toString() {
+        return this.title;
     }
 }
