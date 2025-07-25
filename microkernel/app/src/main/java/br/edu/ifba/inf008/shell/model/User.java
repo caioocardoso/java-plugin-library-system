@@ -17,6 +17,10 @@ public class User {
         return email;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
     public void setUserId(int userId) {
         this.userId = userId;
     }

@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,13 +10,23 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>myplugin</artifactId>
+    <artifactId>bookManagement</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>br.edu.ifba.inf008</groupId>
             <artifactId>interfaces</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>br.edu.ifba.inf008</groupId>
+            <artifactId>executable</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.5.4</version>
         </dependency>
     </dependencies>
 
@@ -31,7 +41,7 @@
                     <!-- Change the output directory -->
                     <outputDirectory>${project.basedir}/../</outputDirectory>
                     <!-- Change the JAR file name -->
-                    <finalName>MyPlugin</finalName>
+                    <finalName>BookManagementPlugin</finalName>
                 </configuration>
             </plugin>
         </plugins>

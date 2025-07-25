@@ -80,7 +80,6 @@ public class UIController extends Application implements IUIController {
         homePane.setId("home-pane");
 
         VBox.setVgrow(tabPane, Priority.ALWAYS);
-        
 
         Tab homeTab = new Tab("Home");
         homeTab.setContent(homePane);
@@ -92,7 +91,7 @@ public class UIController extends Application implements IUIController {
 
         Scene scene = new Scene(vBox, 960, 600);
 
-        scene.getStylesheets().add(UIController.class.getResource("/css/style.css").toExternalForm());
+        scene.getStylesheets().add(UIController.class.getResource("/css/app-styles.css").toExternalForm());
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -121,13 +120,13 @@ public class UIController extends Application implements IUIController {
         return menuItem;
     }
 
-    public boolean createTab(String tabText, Node contents) {
+    public Tab createTab(String tabText, Node contents) {
         Tab tab = new Tab();
         tab.setText(tabText);
         tab.setContent(contents);
         tabPane.getTabs().add(tab);
-
-        return true;
+        tabPane.getSelectionModel().select(tab);
+        return tab;
     }
 
     @Override
