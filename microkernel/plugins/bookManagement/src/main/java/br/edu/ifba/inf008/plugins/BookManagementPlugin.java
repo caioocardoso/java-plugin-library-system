@@ -103,14 +103,7 @@ public class BookManagementPlugin implements IPlugin {
         GridPane formPane = createFormPane();
         formPane.getStyleClass().add("form-pane");
 
-        Button deleteButton = new Button("Delete");
-        deleteButton.getStyleClass().add("delete-button");
-        deleteButton.setOnAction(e -> handleDelete());
-        deleteButton.setDisable(true);
-        bookTable.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldVal, newVal) -> deleteButton.setDisable(newVal == null));
-
-        HBox topBar = new HBox(10, new Label("Search:"), searchField, deleteButton);
+        HBox topBar = new HBox(10, new Label("Search:"), searchField);
         topBar.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
@@ -149,10 +142,18 @@ public class BookManagementPlugin implements IPlugin {
         copiesField.getStyleClass().add("text-field");
 
         Button clearButton = new Button("Clear");
-        saveButton.getStyleClass().add("button");
         clearButton.getStyleClass().add("button");
         clearButton.setOnAction(e -> clearForm());
+        
+        saveButton.getStyleClass().add("button");
         saveButton.setOnAction(e -> handleSave());
+
+        Button deleteButton = new Button("Delete");
+        deleteButton.getStyleClass().add("delete-button");
+        deleteButton.setOnAction(e -> handleDelete());
+        deleteButton.setDisable(true);
+        bookTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> deleteButton.setDisable(newVal == null));
 
         grid.add(new Label("Title:"), 0, 0);
         grid.add(titleField, 1, 0);
@@ -165,11 +166,10 @@ public class BookManagementPlugin implements IPlugin {
         grid.add(new Label("Copies:"), 0, 4);
         grid.add(copiesField, 1, 4);
 
-        HBox buttonBox = new HBox(10, saveButton, clearButton);
+        HBox buttonBox = new HBox(10, saveButton, clearButton, deleteButton);
         buttonBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
         grid.add(buttonBox, 1, 5);
 
-        
         ColumnConstraints col1 = new ColumnConstraints();
         ColumnConstraints col2 = new ColumnConstraints();
         col2.setHgrow(Priority.ALWAYS);
