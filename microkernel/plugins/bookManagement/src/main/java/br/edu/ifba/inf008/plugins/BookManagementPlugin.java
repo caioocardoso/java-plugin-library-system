@@ -23,6 +23,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.geometry.Pos;
 import javafx.scene.layout.ColumnConstraints;
 
 public class BookManagementPlugin implements IPlugin {
@@ -104,7 +105,7 @@ public class BookManagementPlugin implements IPlugin {
         formPane.getStyleClass().add("form-pane");
 
         HBox topBar = new HBox(10, new Label("Search:"), searchField);
-        topBar.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        topBar.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
         VBox mainPane = new VBox(15, topBar, bookTable, formPane);
@@ -167,7 +168,7 @@ public class BookManagementPlugin implements IPlugin {
         grid.add(copiesField, 1, 4);
 
         HBox buttonBox = new HBox(10, saveButton, clearButton, deleteButton);
-        buttonBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
         grid.add(buttonBox, 1, 5);
 
         ColumnConstraints col1 = new ColumnConstraints();

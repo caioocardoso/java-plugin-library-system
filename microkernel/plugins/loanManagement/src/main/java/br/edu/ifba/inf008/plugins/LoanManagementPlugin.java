@@ -6,37 +6,40 @@ import br.edu.ifba.inf008.shell.model.User;
 import br.edu.ifba.inf008.interfaces.ICore;
 import br.edu.ifba.inf008.interfaces.IPlugin;
 import br.edu.ifba.inf008.interfaces.IUIController;
-import br.edu.ifba.inf008.plugins.data.*;
+import br.edu.ifba.inf008.plugins.data.LoanDAO;
+import br.edu.ifba.inf008.plugins.data.LoanDAOImpl;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.geometry.Pos;
-import javafx.event.ActionEvent;
+import javafx.scene.layout.ColumnConstraints;
 
 public class LoanManagementPlugin implements IPlugin {
-
     private final LoanDAO loanDAO = new LoanDAOImpl();
-    private final LoanDAO userDAO = new LoanDAOImpl();
-    private final LoanDAO bookDAO = new LoanDAOImpl();
+    private ObservableList<Loan> masterData = FXCollections.observableArrayList();
+    private ObservableList<User> allUsersMasterData = FXCollections.observableArrayList();
+    private ObservableList<Book> allBooksMasterData = FXCollections.observableArrayList();
 
     private TableView<Loan> loanTable = new TableView<>();
-    private ObservableList<Loan> masterData = FXCollections.observableArrayList();
+    private ComboBox<User> userComboBox = new ComboBox<>();
+    private ComboBox<Book> bookComboBox = new ComboBox<>();
+
+    private Button returnLoanButton = new Button("Return Selected Loan");
 
     private IUIController uiController;
 
@@ -47,19 +50,22 @@ public class LoanManagementPlugin implements IPlugin {
         menuItem.setOnAction(e -> showLoanManagementTab());
 
         Button loanButton = uiController.addQuickAccessButton("", () -> showLoanManagementTab());
-        Image loanIconImage = new Image(getClass().getResourceAsStream("/br/edu/ifba/inf008/plugins/images/loanIcon.png"));
+        Image loanIconImage = new Image(
+                getClass().getResourceAsStream("/br/edu/ifba/inf008/plugins/images/loanIcon.png"));
         ImageView loanIconView = new ImageView(loanIconImage);
         loanIconView.setFitWidth(68);
         loanIconView.setFitHeight(68);
         loanButton.setGraphic(loanIconView);
+
         return true;
     }
 
     private void showLoanManagementTab() {
         VBox loanPane = createManagementPane();
-        loanPane.getStylesheets().add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
+        loanPane.getStylesheets()
+                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
         loanPane.getStyleClass().add("main-pane");
-        loadLoanData();
+        loadData();
         uiController.createTab("Loan Management", loanPane);
     }
 
@@ -67,179 +73,212 @@ public class LoanManagementPlugin implements IPlugin {
         TextField searchField = new TextField();
         searchField.setPromptText("Search by user or book...");
         searchField.getStyleClass().add("search-field");
-
         CheckBox activeOnlyCheckBox = new CheckBox("Show only active loans");
-
-        FilteredList<Loan> filteredData = new FilteredList<>(masterData, p -> true);
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            filteredData.setPredicate(loan -> {
-                if (newVal == null || newVal.isEmpty()) return !activeOnlyCheckBox.isSelected() || loan.getReturnDate() == null;
-                String filter = newVal.toLowerCase();
-                boolean matchesUser = loan.getUser() != null && loan.getUser().getName().toLowerCase().contains(filter);
-                boolean matchesBook = loan.getBook() != null && loan.getBook().getTitle().toLowerCase().contains(filter);
-                boolean active = !activeOnlyCheckBox.isSelected() || loan.getReturnDate() == null;
-                return (matchesUser || matchesBook) && active;
-            });
-        });
-        activeOnlyCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            searchField.fireEvent(new ActionEvent());
-            filteredData.setPredicate(loan -> {
-                String filter = searchField.getText();
-                if (filter == null || filter.isEmpty()) return !newVal || loan.getReturnDate() == null;
-                String lower = filter.toLowerCase();
-                boolean matchesUser = loan.getUser() != null && loan.getUser().getName().toLowerCase().contains(lower);
-                boolean matchesBook = loan.getBook() != null && loan.getBook().getTitle().toLowerCase().contains(lower);
-                boolean active = !newVal || loan.getReturnDate() == null;
-                return (matchesUser || matchesBook) && active;
-            });
-        });
-        loanTable.setItems(filteredData);
-        loanTable.getStyleClass().add("table-view");
-
-        setupTableColumns();
-
-        Button newLoanButton = new Button("New Loan...");
-        newLoanButton.setOnAction(e -> handleNewLoan());
-
-        Button returnLoanButton = new Button("Return Loan");
-        returnLoanButton.setOnAction(e -> handleReturnLoan());
-        returnLoanButton.setDisable(true);
-
-        loanTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            boolean isReturnable = (newSelection != null && newSelection.getReturnDate() == null);
-            returnLoanButton.setDisable(!isReturnable);
-        });
-
-        HBox topBar = new HBox(10, new Label("Search:"), searchField);
-        topBar.setPadding(new Insets(0, 0, 10, 0));
+        HBox topBar = new HBox(10, new Label("Search:"), searchField, activeOnlyCheckBox);
         topBar.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
-        HBox bottomBar = new HBox(15, activeOnlyCheckBox, newLoanButton, returnLoanButton);
-        bottomBar.setPadding(new Insets(10, 0, 0, 0));
-        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+        setupTableAndFilters(searchField, activeOnlyCheckBox);
 
-        VBox mainPane = new VBox(15, topBar, loanTable, bottomBar);
+        GridPane formPane = createFormPane();
+        formPane.getStyleClass().add("form-pane");
+
+        VBox mainPane = new VBox(20, topBar, loanTable, formPane);
         mainPane.setPadding(new Insets(20));
         VBox.setVgrow(loanTable, Priority.ALWAYS);
 
         return mainPane;
     }
 
-    private void setupTableColumns() {
+    private void setupTableAndFilters(TextField searchField, CheckBox activeOnlyCheckBox) {
         loanTable.getColumns().clear();
-        TableColumn<Loan, String> userCol = new TableColumn<>("User");
+
+        TableColumn<Loan, User> userCol = new TableColumn<>("User");
         userCol.setCellValueFactory(new PropertyValueFactory<>("user"));
-        TableColumn<Loan, String> bookCol = new TableColumn<>("Book Title");
+        userCol.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(User user, boolean empty) {
+                super.updateItem(user, empty);
+                setText(empty || user == null ? null : user.getName());
+            }
+        });
+
+        TableColumn<Loan, Book> bookCol = new TableColumn<>("Book Title");
         bookCol.setCellValueFactory(new PropertyValueFactory<>("book"));
+        bookCol.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Book book, boolean empty) {
+                super.updateItem(book, empty);
+                setText(empty || book == null ? null : book.getTitle());
+            }
+        });
+
         TableColumn<Loan, LocalDate> loanDateCol = new TableColumn<>("Loan Date");
         loanDateCol.setCellValueFactory(new PropertyValueFactory<>("loanDate"));
         TableColumn<Loan, LocalDate> returnDateCol = new TableColumn<>("Return Date");
         returnDateCol.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
         loanTable.getColumns().addAll(bookCol, userCol, loanDateCol, returnDateCol);
+        loanTable.getStyleClass().add("table-view");
+
+        FilteredList<Loan> filteredData = new FilteredList<>(masterData, p -> true);
+        loanTable.setItems(filteredData);
         loanTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        Runnable filterUpdater = () -> {
+            String filterText = searchField.getText();
+            boolean activeOnly = activeOnlyCheckBox.isSelected();
+            filteredData.setPredicate(loan -> {
+                boolean activeFilter = !activeOnly || loan.getReturnDate() == null;
+                if (!activeFilter)
+                    return false;
+
+                if (filterText == null || filterText.isEmpty())
+                    return true;
+
+                String lowerCaseFilter = filterText.toLowerCase();
+                return loan.getUser().getName().toLowerCase().contains(lowerCaseFilter) ||
+                        loan.getBook().getTitle().toLowerCase().contains(lowerCaseFilter);
+            });
+        };
+
+        searchField.textProperty().addListener((obs, oldV, newV) -> filterUpdater.run());
+        activeOnlyCheckBox.selectedProperty().addListener((obs, oldV, newV) -> filterUpdater.run());
+
+        loanTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            boolean isReturnable = (newSelection != null && newSelection.getReturnDate() == null);
+            returnLoanButton.setDisable(!isReturnable);
+        });
     }
 
-    private void loadLoanData() {
+    private GridPane createFormPane() {
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(15);
+
+        setupComboBoxFiltering();
+
+        Button registerButton = new Button("Register New Loan");
+        registerButton.setOnAction(e -> handleRegisterLoan());
+
+        returnLoanButton.setOnAction(e -> handleReturnLoan());
+        returnLoanButton.setDisable(true);
+
+        userComboBox.setMaxWidth(Double.MAX_VALUE);
+        bookComboBox.setMaxWidth(Double.MAX_VALUE);
+
+        grid.add(new Label("Search User:"), 0, 0);
+        grid.add(userComboBox, 1, 0);
+        grid.add(new Label("Search Available Book:"), 0, 1);
+        grid.add(bookComboBox, 1, 1);
+
+        HBox buttonBox = new HBox(10, registerButton, returnLoanButton);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        grid.add(buttonBox, 1, 2);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().addAll(col1, col2);
+
+        return grid;
+    }
+
+    private void setupComboBoxFiltering() {
+        userComboBox.setEditable(true);
+        bookComboBox.setEditable(true);
+
+        FilteredList<User> filteredUsers = new FilteredList<>(allUsersMasterData, p -> true);
+        userComboBox.setItems(filteredUsers);
+        userComboBox.getEditor().textProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(() -> {
+            if (userComboBox.getSelectionModel().getSelectedItem() == null ||
+                    !userComboBox.getSelectionModel().getSelectedItem().getName().equals(newVal)) {
+                filteredUsers.setPredicate(user -> user.getName().toLowerCase().contains(newVal.toLowerCase().trim()));
+            }
+        }));
+
+        FilteredList<Book> filteredBooks = new FilteredList<>(allBooksMasterData, p -> true);
+        bookComboBox.setItems(filteredBooks);
+        bookComboBox.getEditor().textProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(() -> {
+            if (bookComboBox.getSelectionModel().getSelectedItem() == null ||
+                    !bookComboBox.getSelectionModel().getSelectedItem().getTitle().equals(newVal)) {
+                filteredBooks.setPredicate(book -> book.getTitle().toLowerCase().contains(newVal.toLowerCase().trim()));
+            }
+        }));
+
+        userComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(User user) {
+                return user == null ? null : user.getName();
+            }
+
+            @Override
+            public User fromString(String string) {
+                return allUsersMasterData.stream().filter(u -> u.getName().equals(string)).findFirst().orElse(null);
+            }
+        });
+        bookComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Book book) {
+                return book == null ? null : book.getTitle();
+            }
+
+            @Override
+            public Book fromString(String string) {
+                return allBooksMasterData.stream().filter(b -> b.getTitle().equals(string)).findFirst().orElse(null);
+            }
+        });
+    }
+
+    private void loadData() {
         try {
             masterData.setAll(loanDAO.getAllLoans());
+            allUsersMasterData.setAll(loanDAO.getAllUsers());
+            allBooksMasterData.setAll(loanDAO.getAvailableBooks());
         } catch (SQLException ex) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to load loans: " + ex.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to load initial data: " + ex.getMessage());
         }
     }
 
-    private void handleNewLoan() {
-        Dialog<Loan> dialog = new Dialog<>();
-        dialog.setTitle("Register New Loan");
+    private void handleRegisterLoan() {
+        User selectedUser = userComboBox.getValue();
+        Book selectedBook = bookComboBox.getValue();
 
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
-
-        ComboBox<User> userComboBox = new ComboBox<>();
-        ComboBox<Book> bookComboBox = new ComboBox<>();
-
-        try {
-            userComboBox.setItems(FXCollections.observableArrayList(userDAO.getAllUsers()));
-            bookComboBox.setItems(FXCollections.observableArrayList(bookDAO.getAvailableBooks()));
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to load users or books.");
+        if (selectedUser == null || selectedBook == null) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "You must select a user and a book.");
             return;
         }
 
-        userComboBox.setConverter(new StringConverter<User>() {
-            @Override
-            public String toString(User user) {
-                return user == null ? "" : user.getName();
-            }
+        Loan newLoan = new Loan();
+        newLoan.setUser(selectedUser);
+        newLoan.setBook(selectedBook);
+        newLoan.setLoanDate(LocalDate.now());
 
-            @Override
-            public User fromString(String s) {
-                return null;
-            }
-        });
-
-        bookComboBox.setConverter(new StringConverter<Book>() {
-            @Override
-            public String toString(Book book) {
-                return book == null ? "" : book.getTitle();
-            }
-
-            @Override
-            public Book fromString(String s) {
-                return null;
-            }
-        });
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.add(new Label("User:"), 0, 0);
-        grid.add(userComboBox, 1, 0);
-        grid.add(new Label("Book:"), 0, 1);
-        grid.add(bookComboBox, 1, 1);
-        dialog.getDialogPane().setContent(grid);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-                Loan newLoan = new Loan();
-                newLoan.setUser(userComboBox.getValue());
-                newLoan.setBook(bookComboBox.getValue());
-                newLoan.setLoanDate(LocalDate.now());
-                return newLoan;
-            }
-            return null;
-        });
-
-        Optional<Loan> result = dialog.showAndWait();
-        result.ifPresent(loan -> {
-            if (loan.getUser() == null || loan.getBook() == null) {
-                showAlert(Alert.AlertType.ERROR, "Validation Error", "You must select a user and a book.");
-                return;
-            }
-            try {
-                loanDAO.addLoan(loan);
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Loan registered successfully.");
-                loadLoanData();
-            } catch (IllegalStateException | SQLException ex) {
-                showAlert(Alert.AlertType.ERROR, "Operation Failed", ex.getMessage());
-            }
-        });
+        try {
+            loanDAO.addLoan(newLoan);
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Loan registered successfully.");
+            loadData();
+            userComboBox.getSelectionModel().clearSelection();
+            userComboBox.getEditor().clear();
+            bookComboBox.getSelectionModel().clearSelection();
+            bookComboBox.getEditor().clear();
+        } catch (IllegalStateException | SQLException ex) {
+            showAlert(Alert.AlertType.ERROR, "Operation Failed", ex.getMessage());
+        }
     }
 
     private void handleReturnLoan() {
         Loan selectedLoan = loanTable.getSelectionModel().getSelectedItem();
-        if (selectedLoan == null || selectedLoan.getReturnDate() != null) {
-            showAlert(Alert.AlertType.WARNING, "Invalid Action", "Please select an active loan to return.");
+        if (selectedLoan == null)
             return;
-        }
 
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "Return the book '" + selectedLoan.getBook().getTitle() + "'?", ButtonType.YES, ButtonType.NO);
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
+                "Return the book '" + selectedLoan.getBook().getTitle() + "'?", ButtonType.YES, ButtonType.NO);
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
                     loanDAO.returnLoan(selectedLoan.getLoanId());
                     showAlert(Alert.AlertType.INFORMATION, "Success", "Book returned successfully.");
-                    loadLoanData();
+                    loadData();
                 } catch (SQLException ex) {
                     showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to return the book: " + ex.getMessage());
                 }
@@ -252,7 +291,8 @@ public class LoanManagementPlugin implements IPlugin {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        alert.getDialogPane().getStylesheets().add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
+        alert.getDialogPane().getStylesheets()
+                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
         alert.showAndWait();
     }
 }
