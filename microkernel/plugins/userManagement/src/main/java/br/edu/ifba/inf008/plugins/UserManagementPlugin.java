@@ -45,8 +45,7 @@ public class UserManagementPlugin implements IPlugin {
         menuItem.setOnAction(e -> showUserManagementTab());
 
         Button usersButton = uiController.addQuickAccessButton("", () -> showUserManagementTab());
-        Image userIconImage = new Image(
-                getClass().getResourceAsStream("/br/edu/ifba/inf008/plugins/images/userIcon.png"));
+        Image userIconImage = new Image(getClass().getResourceAsStream("/br/edu/ifba/inf008/plugins/images/userIcon.png"));
         ImageView userIconView = new ImageView(userIconImage);
         userIconView.setFitWidth(48);
         userIconView.setFitHeight(48);
@@ -57,8 +56,7 @@ public class UserManagementPlugin implements IPlugin {
 
     private void showUserManagementTab() {
         VBox userPane = createManagementPane();
-        userPane.getStylesheets()
-                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/user-styles.css").toExternalForm());
+        userPane.getStylesheets().add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/user-styles.css").toExternalForm());
         userPane.getStyleClass().add("main-pane");
         loadUserData();
         uiController.createTab("User Management", userPane);
@@ -102,7 +100,14 @@ public class UserManagementPlugin implements IPlugin {
         GridPane formPane = createFormPane();
         formPane.getStyleClass().add("form-pane");
 
-        HBox topBar = new HBox(10, new Label("Search:"), searchField);
+        Button deleteButton = new Button("Delete");
+        deleteButton.getStyleClass().add("delete-button");
+        deleteButton.setOnAction(e -> handleDelete());
+        deleteButton.setDisable(true);
+        userTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> deleteButton.setDisable(newVal == null));
+
+        HBox topBar = new HBox(10, new Label("Search:"), searchField, deleteButton);
         topBar.setPadding(new Insets(0, 0, 10, 0));
         topBar.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(searchField, Priority.ALWAYS);
@@ -136,26 +141,19 @@ public class UserManagementPlugin implements IPlugin {
 
         Button clearButton = new Button("Clear");
         clearButton.setOnAction(e -> clearForm());
-        clearButton.getStyleClass().add("button");
 
         saveButton.setOnAction(e -> handleSave());
-        saveButton.getStyleClass().add("button");
-
-        Button deleteButton = new Button("Delete");
-        deleteButton.setOnAction(e -> handleDelete());
-        deleteButton.getStyleClass().add("delete-button");
-        deleteButton.setDisable(true);
-        userTable.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldVal, newVal) -> deleteButton.setDisable(newVal == null));
 
         nameField.getStyleClass().add("text-field");
         emailField.getStyleClass().add("text-field");
+        saveButton.getStyleClass().add("button");
+        clearButton.getStyleClass().add("button");
 
         grid.add(new Label("Name:"), 0, 0);
         grid.add(nameField, 1, 0);
         grid.add(new Label("Email:"), 0, 1);
         grid.add(emailField, 1, 1);
-        HBox buttonBox = new HBox(10, saveButton, clearButton, deleteButton);
+        HBox buttonBox = new HBox(10, saveButton, clearButton);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
         grid.add(buttonBox, 1, 2);
 
