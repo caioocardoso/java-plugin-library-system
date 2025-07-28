@@ -4,7 +4,6 @@ import br.edu.ifba.inf008.shell.data.DatabaseConnection;
 import br.edu.ifba.inf008.shell.model.Book;
 import br.edu.ifba.inf008.shell.model.Loan;
 import br.edu.ifba.inf008.shell.model.User;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +161,6 @@ public class LoanDAOImpl implements LoanDAO {
     @Override
     public List<Book> getAvailableBooks() throws SQLException {
         List<Book> books = new ArrayList<>();
-        // Pega apenas livros com cópias disponíveis
         String sql = "SELECT book_id, title, author FROM books WHERE copies_available > 0 ORDER BY title";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();

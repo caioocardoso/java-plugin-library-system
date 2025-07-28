@@ -195,6 +195,12 @@ public class LoanManagementPlugin implements IPlugin {
                 filteredUsers.setPredicate(user -> user.getName().toLowerCase().contains(newVal.toLowerCase().trim()));
             }
         }));
+        
+        userComboBox.getEditor().setOnMouseClicked(e -> {
+            if (!userComboBox.isShowing()) {
+                userComboBox.show();
+            }
+        });
 
         FilteredList<Book> filteredBooks = new FilteredList<>(allBooksMasterData, p -> true);
         bookComboBox.setItems(filteredBooks);
@@ -204,6 +210,12 @@ public class LoanManagementPlugin implements IPlugin {
                 filteredBooks.setPredicate(book -> book.getTitle().toLowerCase().contains(newVal.toLowerCase().trim()));
             }
         }));
+
+        bookComboBox.getEditor().setOnMouseClicked(e -> {
+            if (!bookComboBox.isShowing()) {
+                bookComboBox.show();
+            }
+        });
 
         userComboBox.setConverter(new StringConverter<>() {
             @Override
