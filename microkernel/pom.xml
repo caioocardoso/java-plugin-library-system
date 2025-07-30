@@ -11,9 +11,10 @@
     <modules>
         <module>interfaces</module>
         <module>app</module>
-        <module>plugins/bookManagement</module>
         <module>plugins/userManagement</module>
+        <module>plugins/bookManagement</module>
         <module>plugins/loanManagement</module>
+        <module>plugins/reportPlugin</module>
     </modules>
 
     <properties>

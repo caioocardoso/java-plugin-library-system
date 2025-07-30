@@ -43,9 +43,6 @@ public class BookManagementPlugin implements IPlugin {
     @Override
     public boolean init() {
         this.uiController = ICore.getInstance().getUIController();
-        MenuItem menuItem = uiController.createMenuItem("Menu", "Books");
-
-        menuItem.setOnAction(e -> showBookManagementTab());
 
         Button booksButton = uiController.addQuickAccessButton("", () -> showBookManagementTab());
         Image bookIconImage = new Image(

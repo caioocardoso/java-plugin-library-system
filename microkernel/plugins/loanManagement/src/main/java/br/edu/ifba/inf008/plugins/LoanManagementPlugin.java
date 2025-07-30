@@ -46,8 +46,6 @@ public class LoanManagementPlugin implements IPlugin {
     @Override
     public boolean init() {
         this.uiController = ICore.getInstance().getUIController();
-        MenuItem menuItem = uiController.createMenuItem("Menu", "Loans");
-        menuItem.setOnAction(e -> showLoanManagementTab());
 
         Button loanButton = uiController.addQuickAccessButton("", () -> showLoanManagementTab());
         Image loanIconImage = new Image(
