@@ -68,15 +68,6 @@ public class BookManagementPlugin implements IPlugin {
         return true;
     }
 
-    // private void showBookManagementTab() {
-    // VBox bookPane = createManagementPane();
-    // bookPane.getStylesheets()
-    // .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/book-styles.css").toExternalForm());
-    // bookPane.getStyleClass().add("main-pane");
-    // loadBookData();
-    // uiController.createTab("Book Management", bookPane);
-    // }
-
     private VBox createManagementPane() {
         TextField searchField = new TextField();
         searchField.setPromptText("Search by title or author...");

@@ -65,15 +65,6 @@ public class UserManagementPlugin implements IPlugin {
         return true;
     }
 
-    // private void showUserManagementTab() {
-    //     VBox userPane = createManagementPane();
-    //     userPane.getStylesheets()
-    //             .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/user-styles.css").toExternalForm());
-    //     userPane.getStyleClass().add("main-pane");
-    //     loadUserData();
-    //     uiController.showTab("User Management", userPane);
-    // }
-
     private VBox createManagementPane() {
         TextField searchField = new TextField();
         searchField.setPromptText("Search by name or email...");

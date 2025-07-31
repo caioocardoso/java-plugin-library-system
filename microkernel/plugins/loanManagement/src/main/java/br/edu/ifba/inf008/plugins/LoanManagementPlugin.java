@@ -72,15 +72,6 @@ public class LoanManagementPlugin implements IPlugin {
         return true;
     }
 
-    // private void showLoanManagementTab() {
-    // VBox loanPane = createManagementPane();
-    // loanPane.getStylesheets()
-    // .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
-    // loanPane.getStyleClass().add("main-pane");
-    // loadData();
-    // uiController.createTab("Loan Management", loanPane);
-    // }
-
     private VBox createManagementPane() {
         TextField searchField = new TextField();
         searchField.setPromptText("Search by user or book...");

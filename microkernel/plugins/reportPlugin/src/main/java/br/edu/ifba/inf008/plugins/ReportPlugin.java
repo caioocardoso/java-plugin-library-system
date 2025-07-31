@@ -53,15 +53,6 @@ public class ReportPlugin implements IPlugin {
         return true;
     }
 
-    // private void showReportTab() {
-    //     VBox reportPane = createReportPane();
-    //     reportPane.getStylesheets()
-    //             .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/report-styles.css").toExternalForm());
-    //     reportPane.getStyleClass().add("main-pane");
-    //     loadReportData();
-    //     uiController.createTab("Active Loans Report", reportPane);
-    // }
-
     private VBox createReportPane() {
         setupTableColumns();
 
