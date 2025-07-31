@@ -41,7 +41,20 @@ public class UserManagementPlugin implements IPlugin {
     public boolean init() {
         this.uiController = ICore.getInstance().getUIController();
 
-        Button usersButton = uiController.addQuickAccessButton("", () -> showUserManagementTab());
+        Button usersButton = uiController.addQuickAccessButton("", () -> {
+            uiController.showTab("User Management", () -> {
+                VBox userPane = createManagementPane();
+
+                userPane.getStylesheets().add(
+                        getClass().getResource("/br/edu/ifba/inf008/plugins/css/user-styles.css").toExternalForm());
+                userPane.getStyleClass().add("main-pane");
+
+                loadUserData();
+
+                return userPane;
+            });
+        });
+
         Image userIconImage = new Image(
                 getClass().getResourceAsStream("/br/edu/ifba/inf008/plugins/images/userIcon.png"));
         ImageView userIconView = new ImageView(userIconImage);
@@ -52,14 +65,14 @@ public class UserManagementPlugin implements IPlugin {
         return true;
     }
 
-    private void showUserManagementTab() {
-        VBox userPane = createManagementPane();
-        userPane.getStylesheets()
-                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/user-styles.css").toExternalForm());
-        userPane.getStyleClass().add("main-pane");
-        loadUserData();
-        uiController.createTab("User Management", userPane);
-    }
+    // private void showUserManagementTab() {
+    //     VBox userPane = createManagementPane();
+    //     userPane.getStylesheets()
+    //             .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/user-styles.css").toExternalForm());
+    //     userPane.getStyleClass().add("main-pane");
+    //     loadUserData();
+    //     uiController.showTab("User Management", userPane);
+    // }
 
     private VBox createManagementPane() {
         TextField searchField = new TextField();

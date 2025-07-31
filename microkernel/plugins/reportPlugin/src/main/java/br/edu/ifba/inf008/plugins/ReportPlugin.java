@@ -30,7 +30,20 @@ public class ReportPlugin implements IPlugin {
     public boolean init() {
         this.uiController = ICore.getInstance().getUIController();
 
-        Button reportsButton = uiController.addQuickAccessButton("", () -> showReportTab());
+        Button reportsButton = uiController.addQuickAccessButton("", () -> {
+            uiController.showTab("Report", () -> {
+                VBox reportPane = createReportPane();
+
+                reportPane.getStylesheets().add(
+                        getClass().getResource("/br/edu/ifba/inf008/plugins/css/report-styles.css").toExternalForm());
+                reportPane.getStyleClass().add("main-pane");
+
+                loadReportData();
+
+                return reportPane;
+            });
+        });
+        
         Image reportsIconImage = new Image(getClass().getResourceAsStream("/br/edu/ifba/inf008/plugins/images/reportIcon.png"));
         ImageView reportsIconView = new ImageView(reportsIconImage);
         reportsIconView.setFitWidth(48);
@@ -40,14 +53,14 @@ public class ReportPlugin implements IPlugin {
         return true;
     }
 
-    private void showReportTab() {
-        VBox reportPane = createReportPane();
-        reportPane.getStylesheets()
-                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/report-styles.css").toExternalForm());
-        reportPane.getStyleClass().add("main-pane");
-        loadReportData();
-        uiController.createTab("Active Loans Report", reportPane);
-    }
+    // private void showReportTab() {
+    //     VBox reportPane = createReportPane();
+    //     reportPane.getStylesheets()
+    //             .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/report-styles.css").toExternalForm());
+    //     reportPane.getStyleClass().add("main-pane");
+    //     loadReportData();
+    //     uiController.createTab("Active Loans Report", reportPane);
+    // }
 
     private VBox createReportPane() {
         setupTableColumns();

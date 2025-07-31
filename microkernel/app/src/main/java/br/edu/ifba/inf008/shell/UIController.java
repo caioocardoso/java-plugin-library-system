@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.geometry.Pos;
+import java.util.function.Supplier;
 
 public class UIController extends Application implements IUIController {
 
@@ -120,13 +121,23 @@ public class UIController extends Application implements IUIController {
         return menuItem;
     }
 
-    public Tab createTab(String tabText, Node contents) {
-        Tab tab = new Tab();
-        tab.setText(tabText);
-        tab.setContent(contents);
-        tabPane.getTabs().add(tab);
-        tabPane.getSelectionModel().select(tab);
-        return tab;
+    public boolean showTab(String tabText, Supplier<Node> contentSupplier) {
+        for (Tab tab : tabPane.getTabs()) {
+            if (tabText.equals(tab.getText())) {
+                tabPane.getSelectionModel().select(tab);
+                return true;
+            }
+        }
+
+        Node contents = contentSupplier.get();
+
+        Tab newTab = new Tab(tabText);
+        newTab.setContent(contents);
+        tabPane.getTabs().add(newTab);
+
+        tabPane.getSelectionModel().select(newTab);
+
+        return true;
     }
 
     @Override
