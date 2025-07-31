@@ -46,27 +46,30 @@ public class LoanManagementPlugin implements IPlugin {
     @Override
     public boolean init() {
         this.uiController = ICore.getInstance().getUIController();
-        MenuItem menuItem = uiController.createMenuItem("Menu", "Loans");
-        menuItem.setOnAction(e -> showLoanManagementTab());
 
-        Button loanButton = uiController.addQuickAccessButton("", () -> showLoanManagementTab());
+        Button loanButton = uiController.addQuickAccessButton("", () -> {
+            uiController.showTab("Loan Management", () -> {
+                VBox loanPane = createManagementPane();
+
+                loanPane.getStylesheets().add(
+                        getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
+                loanPane.getStyleClass().add("main-pane");
+
+                loadData();
+
+                return loanPane;
+            });
+        });
+
         Image loanIconImage = new Image(
                 getClass().getResourceAsStream("/br/edu/ifba/inf008/plugins/images/loanIcon.png"));
-        ImageView loanIconView = new ImageView(loanIconImage);
+        ImageView loanIconView = new ImageView(
+                loanIconImage);
         loanIconView.setFitWidth(68);
         loanIconView.setFitHeight(68);
         loanButton.setGraphic(loanIconView);
 
         return true;
-    }
-
-    private void showLoanManagementTab() {
-        VBox loanPane = createManagementPane();
-        loanPane.getStylesheets()
-                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
-        loanPane.getStyleClass().add("main-pane");
-        loadData();
-        uiController.createTab("Loan Management", loanPane);
     }
 
     private VBox createManagementPane() {
@@ -195,7 +198,7 @@ public class LoanManagementPlugin implements IPlugin {
                 filteredUsers.setPredicate(user -> user.getName().toLowerCase().contains(newVal.toLowerCase().trim()));
             }
         }));
-        
+
         userComboBox.getEditor().setOnMouseClicked(e -> {
             if (!userComboBox.isShowing()) {
                 userComboBox.show();

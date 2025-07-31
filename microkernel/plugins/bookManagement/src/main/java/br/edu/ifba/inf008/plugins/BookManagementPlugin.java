@@ -43,11 +43,21 @@ public class BookManagementPlugin implements IPlugin {
     @Override
     public boolean init() {
         this.uiController = ICore.getInstance().getUIController();
-        MenuItem menuItem = uiController.createMenuItem("Menu", "Books");
 
-        menuItem.setOnAction(e -> showBookManagementTab());
+        Button booksButton = uiController.addQuickAccessButton("", () -> {
+            uiController.showTab("Book Management", () -> {
+                VBox bookPane = createManagementPane();
 
-        Button booksButton = uiController.addQuickAccessButton("", () -> showBookManagementTab());
+                bookPane.getStylesheets().add(
+                        getClass().getResource("/br/edu/ifba/inf008/plugins/css/book-styles.css").toExternalForm());
+                bookPane.getStyleClass().add("main-pane");
+
+                loadBookData();
+
+                return bookPane;
+            });
+        });
+
         Image bookIconImage = new Image(
                 getClass().getResourceAsStream("/br/edu/ifba/inf008/plugins/images/bookIcon.png"));
         ImageView bookIconView = new ImageView(bookIconImage);
@@ -56,15 +66,6 @@ public class BookManagementPlugin implements IPlugin {
         booksButton.setGraphic(bookIconView);
 
         return true;
-    }
-
-    private void showBookManagementTab() {
-        VBox bookPane = createManagementPane();
-        bookPane.getStylesheets()
-                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/book-styles.css").toExternalForm());
-        bookPane.getStyleClass().add("main-pane");
-        loadBookData();
-        uiController.createTab("Book Management", bookPane);
     }
 
     private VBox createManagementPane() {
@@ -145,7 +146,7 @@ public class BookManagementPlugin implements IPlugin {
         Button clearButton = new Button("Clear");
         clearButton.getStyleClass().add("button");
         clearButton.setOnAction(e -> clearForm());
-        
+
         saveButton.getStyleClass().add("button");
         saveButton.setOnAction(e -> handleSave());
 
