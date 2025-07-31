@@ -11,7 +11,7 @@
     -fx-font-size: 32px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.0, 0, 2);
 }
 
 .home-subtitle {
@@ -36,9 +36,9 @@
     -fx-border-radius: 18px;
     -fx-background-radius: 18px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 16, 0, 0, 8);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 16, 0, 0, 8);
     -fx-alignment: center;
-    -fx-transition: all 0.2s cubic-bezier(.4,2,.6,1);
+    -fx-transition: all 0.2s cubic-bezier(.4, 2, .6, 1);
 }
 
 .quick-button:hover {
@@ -46,11 +46,44 @@
     -fx-text-fill: #fff;
     -fx-scale-x: 1.04;
     -fx-scale-y: 1.04;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 16, 0, 0, 8);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 16, 0, 0, 8);
 }
 
 .quick-button-icon {
     -fx-fill: white;
     -fx-scale-x: 0.1;
     -fx-scale-y: 0.1;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #2b2b2b;
+    -fx-padding: 5px 0 0 0;
+}
+
+.tab {
+    -fx-background-color: #202020;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-padding: 10px 25px;
+    -fx-background-insets: 0 2 0 0;
+}
+
+.tab:selected {
+    -fx-background-color: #585858;
+    -fx-padding: 12px 25px;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #d4d4d4;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.tab:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.tab-pane:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
