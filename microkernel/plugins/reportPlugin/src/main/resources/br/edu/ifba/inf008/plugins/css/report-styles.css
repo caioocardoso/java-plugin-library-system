@@ -209,6 +209,13 @@
 
 .check-box.switch {
     -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.check-box.switch:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
 }
 
 .check-box.switch>.box {
