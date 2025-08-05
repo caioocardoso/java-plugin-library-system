@@ -30,6 +30,7 @@ import javafx.util.StringConverter;
 import javafx.scene.layout.ColumnConstraints;
 
 public class LoanManagementPlugin implements IPlugin {
+
     private final LoanDAO loanDAO = new LoanDAOImpl();
     private ObservableList<Loan> masterData = FXCollections.observableArrayList();
     private ObservableList<User> allUsersMasterData = FXCollections.observableArrayList();
@@ -132,15 +133,17 @@ public class LoanManagementPlugin implements IPlugin {
             boolean activeOnly = activeOnlyCheckBox.isSelected();
             filteredData.setPredicate(loan -> {
                 boolean activeFilter = !activeOnly || loan.getReturnDate() == null;
-                if (!activeFilter)
+                if (!activeFilter) {
                     return false;
+                }
 
-                if (filterText == null || filterText.isEmpty())
+                if (filterText == null || filterText.isEmpty()) {
                     return true;
+                }
 
                 String lowerCaseFilter = filterText.toLowerCase();
-                return loan.getUser().getName().toLowerCase().contains(lowerCaseFilter) ||
-                        loan.getBook().getTitle().toLowerCase().contains(lowerCaseFilter);
+                return loan.getUser().getName().toLowerCase().contains(lowerCaseFilter)
+                        || loan.getBook().getTitle().toLowerCase().contains(lowerCaseFilter);
             });
         };
 
@@ -193,8 +196,8 @@ public class LoanManagementPlugin implements IPlugin {
         FilteredList<User> filteredUsers = new FilteredList<>(allUsersMasterData, p -> true);
         userComboBox.setItems(filteredUsers);
         userComboBox.getEditor().textProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(() -> {
-            if (userComboBox.getSelectionModel().getSelectedItem() == null ||
-                    !userComboBox.getSelectionModel().getSelectedItem().getName().equals(newVal)) {
+            if (userComboBox.getSelectionModel().getSelectedItem() == null
+                    || !userComboBox.getSelectionModel().getSelectedItem().getName().equals(newVal)) {
                 filteredUsers.setPredicate(user -> user.getName().toLowerCase().contains(newVal.toLowerCase().trim()));
             }
         }));
@@ -208,8 +211,8 @@ public class LoanManagementPlugin implements IPlugin {
         FilteredList<Book> filteredBooks = new FilteredList<>(allBooksMasterData, p -> true);
         bookComboBox.setItems(filteredBooks);
         bookComboBox.getEditor().textProperty().addListener((obs, oldVal, newVal) -> Platform.runLater(() -> {
-            if (bookComboBox.getSelectionModel().getSelectedItem() == null ||
-                    !bookComboBox.getSelectionModel().getSelectedItem().getTitle().equals(newVal)) {
+            if (bookComboBox.getSelectionModel().getSelectedItem() == null
+                    || !bookComboBox.getSelectionModel().getSelectedItem().getTitle().equals(newVal)) {
                 filteredBooks.setPredicate(book -> book.getTitle().toLowerCase().contains(newVal.toLowerCase().trim()));
             }
         }));
@@ -283,15 +286,16 @@ public class LoanManagementPlugin implements IPlugin {
 
     private void handleReturnLoan() {
         Loan selectedLoan = loanTable.getSelectionModel().getSelectedItem();
-        if (selectedLoan == null)
+        if (selectedLoan == null) {
             return;
+        }
 
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
                 "Return the book '" + selectedLoan.getBook().getTitle() + "'?", ButtonType.YES, ButtonType.NO);
         confirmation.getDialogPane().getStylesheets()
                 .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
 
-                confirmation.showAndWait().ifPresent(response -> {
+        confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
                     loanDAO.returnLoan(selectedLoan.getLoanId());
