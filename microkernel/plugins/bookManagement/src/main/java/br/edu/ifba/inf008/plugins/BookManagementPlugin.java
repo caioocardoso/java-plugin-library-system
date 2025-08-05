@@ -27,6 +27,7 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.ColumnConstraints;
 
 public class BookManagementPlugin implements IPlugin {
+
     private final BookDAO bookDAO = new BookDAOImpl();
     private TableView<Book> bookTable = new TableView<>();
     private ObservableList<Book> masterData = FXCollections.observableArrayList();
@@ -76,11 +77,13 @@ public class BookManagementPlugin implements IPlugin {
         FilteredList<Book> filteredData = new FilteredList<>(masterData, p -> true);
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             filteredData.setPredicate(book -> {
-                if (newVal == null || newVal.isEmpty())
+                if (newVal == null || newVal.isEmpty()) {
                     return true;
+                }
                 String filter = newVal.toLowerCase();
-                if (book.getTitle().toLowerCase().contains(filter))
+                if (book.getTitle().toLowerCase().contains(filter)) {
                     return true;
+                }
                 return book.getAuthor().toLowerCase().contains(filter);
             });
         });
@@ -229,11 +232,15 @@ public class BookManagementPlugin implements IPlugin {
     }
 
     private void handleDelete() {
-        if (selectedBook == null)
+        if (selectedBook == null) {
             return;
+        }
 
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
                 "Are you sure you want to delete '" + selectedBook.getTitle() + "'?", ButtonType.YES, ButtonType.NO);
+        confirmation.getDialogPane().getStylesheets()
+                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
+
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
@@ -263,6 +270,8 @@ public class BookManagementPlugin implements IPlugin {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        alert.getDialogPane().getStylesheets()
+                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
         alert.showAndWait();
     }
 }

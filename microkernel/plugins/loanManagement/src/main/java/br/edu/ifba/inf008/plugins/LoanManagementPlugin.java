@@ -288,7 +288,10 @@ public class LoanManagementPlugin implements IPlugin {
 
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
                 "Return the book '" + selectedLoan.getBook().getTitle() + "'?", ButtonType.YES, ButtonType.NO);
-        confirmation.showAndWait().ifPresent(response -> {
+        confirmation.getDialogPane().getStylesheets()
+                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
+
+                confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
                     loanDAO.returnLoan(selectedLoan.getLoanId());

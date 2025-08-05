@@ -27,6 +27,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.geometry.Pos;
 
 public class UserManagementPlugin implements IPlugin {
+
     private final UserDAO userDAO = new UserDAOImpl();
     private TableView<User> userTable = new TableView<>();
     private ObservableList<User> masterData = FXCollections.observableArrayList();
@@ -206,11 +207,15 @@ public class UserManagementPlugin implements IPlugin {
     }
 
     private void handleDelete() {
-        if (selectedUser == null)
+        if (selectedUser == null) {
             return;
+        }
 
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
                 "Are you sure you want to delete " + selectedUser.getName() + "?", ButtonType.YES, ButtonType.NO);
+        confirmation.getDialogPane().getStylesheets()
+                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
+
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
@@ -237,6 +242,8 @@ public class UserManagementPlugin implements IPlugin {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        alert.getDialogPane().getStylesheets()
+                .add(getClass().getResource("/br/edu/ifba/inf008/plugins/css/loan-styles.css").toExternalForm());
         alert.showAndWait();
     }
 }
