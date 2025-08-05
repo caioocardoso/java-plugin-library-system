@@ -47,4 +47,45 @@ public class ReportDAOImpl implements ReportDAO {
         }
         return activeLoans;
     }
+
+    @Override
+    public List<Loan> getReturnedLoans() throws SQLException {
+        List<Loan> returnedLoans = new ArrayList<>();
+        String sql = "SELECT l.loan_id, l.loan_date, l.return_date, " +
+                     "u.user_id, u.name, " +
+                     "b.book_id, b.title, b.author " +
+                     "FROM loans l " +
+                     "JOIN users u ON l.user_id = u.user_id " +
+                     "JOIN books b ON l.book_id = b.book_id " +
+                     "WHERE l.return_date IS NOT NULL " +
+                     "ORDER BY l.return_date DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setName(rs.getString("name"));
+
+                Book book = new Book();
+                book.setBookId(rs.getInt("book_id"));
+                book.setTitle(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
+
+                Loan loan = new Loan();
+                loan.setLoanId(rs.getInt("loan_id"));
+                loan.setUser(user);
+                loan.setBook(book);
+                loan.setLoanDate(rs.getDate("loan_date").toLocalDate());
+                if (rs.getDate("return_date") != null) {
+                    loan.setReturnDate(rs.getDate("return_date").toLocalDate());
+                }
+                
+                returnedLoans.add(loan);
+            }
+        }
+        return returnedLoans;
+    }
 }

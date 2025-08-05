@@ -192,3 +192,46 @@
     -fx-background-color: #0d63bf;
     -fx-text-fill: white;
 }
+
+.switch-container {
+    -fx-alignment: center-left;
+}
+
+.switch-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.status-label {
+    -fx-font-style: italic;
+    -fx-text-fill: #bbbbbb;
+}
+
+.check-box.switch {
+    -fx-padding: 0;
+}
+
+.check-box.switch>.box {
+    -fx-background-color: #4a4a4a;
+    -fx-background-radius: 15px;
+    -fx-padding: 2px;
+    -fx-pref-width: 50px;
+    -fx-pref-height: 25px;
+    -fx-border-color: #666666;
+    -fx-border-radius: 15px;
+}
+
+.check-box.switch>.box>.mark {
+    -fx-opacity: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+
+.check-box.switch:selected>.box {
+    -fx-background-color: #4CAF50;
+    -fx-border-color: #45a049;
+}
+
+.check-box.switch:selected>.box>.mark {
+    -fx-opacity: 0;
+}

@@ -13,10 +13,12 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -25,6 +27,8 @@ public class ReportPlugin implements IPlugin {
     private final ReportDAO reportDAO = new ReportDAOImpl();
     private TableView<Loan> reportTable = new TableView<>();
     private IUIController uiController;
+    private CheckBox activeLoansSwitch;
+    private Label statusLabel;
 
     @Override
     public boolean init() {
@@ -56,14 +60,44 @@ public class ReportPlugin implements IPlugin {
     private VBox createReportPane() {
         setupTableColumns();
 
+        // Create a nice switch with label
+        Label switchLabel = new Label("Active Loans:");
+        switchLabel.getStyleClass().add("switch-label");
+        
+        activeLoansSwitch = new CheckBox();
+        activeLoansSwitch.setSelected(true);
+        activeLoansSwitch.setOnAction(e -> {
+            updateSwitchStatus();
+            loadReportData();
+        });
+        activeLoansSwitch.getStyleClass().add("switch");
+
+        HBox switchContainer = new HBox(10, switchLabel, activeLoansSwitch);
+        switchContainer.setAlignment(Pos.CENTER_LEFT);
+        switchContainer.getStyleClass().add("switch-container");
+
+        statusLabel = new Label("Showing: Active Loans");
+        statusLabel.getStyleClass().add("status-label");
+
         Button refreshButton = new Button("Refresh");
         refreshButton.setOnAction(e -> loadReportData());
         refreshButton.getStyleClass().add("button");
 
-        VBox mainPane = new VBox(15, reportTable, refreshButton);
+        HBox controlPanel = new HBox(15, switchContainer, refreshButton);
+        controlPanel.setAlignment(Pos.CENTER_LEFT);
+
+        VBox mainPane = new VBox(15, reportTable, controlPanel, statusLabel);
         mainPane.setPadding(new Insets(20));
         VBox.setVgrow(reportTable, Priority.ALWAYS);
         return mainPane;
+    }
+
+    private void updateSwitchStatus() {
+        if (activeLoansSwitch.isSelected()) {
+            statusLabel.setText("Showing: Active Loans");
+        } else {
+            statusLabel.setText("Showing: Returned Loans");
+        }
     }
 
     private void setupTableColumns() {
@@ -102,14 +136,27 @@ public class ReportPlugin implements IPlugin {
         TableColumn<Loan, LocalDate> loanDateCol = new TableColumn<>("Loan Date");
         loanDateCol.setCellValueFactory(new PropertyValueFactory<>("loanDate"));
 
-        reportTable.getColumns().addAll(titleCol, authorCol, userCol, loanDateCol);
+        if (activeLoansSwitch != null && !activeLoansSwitch.isSelected()) {
+            TableColumn<Loan, LocalDate> returnDateCol = new TableColumn<>("Return Date");
+            returnDateCol.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
+            reportTable.getColumns().addAll(titleCol, authorCol, userCol, loanDateCol, returnDateCol);
+        } else {
+            reportTable.getColumns().addAll(titleCol, authorCol, userCol, loanDateCol);
+        }
+
         reportTable.getStyleClass().add("table-view");
         reportTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
     private void loadReportData() {
         try {
-            reportTable.setItems(FXCollections.observableArrayList(reportDAO.getActiveLoans()));
+            setupTableColumns();
+            
+            if (activeLoansSwitch != null && activeLoansSwitch.isSelected()) {
+                reportTable.setItems(FXCollections.observableArrayList(reportDAO.getActiveLoans()));
+            } else {
+                reportTable.setItems(FXCollections.observableArrayList(reportDAO.getReturnedLoans()));
+            }
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to load the report: " + e.getMessage());
         }
