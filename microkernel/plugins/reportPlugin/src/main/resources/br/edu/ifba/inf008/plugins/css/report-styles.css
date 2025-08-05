@@ -192,3 +192,63 @@
     -fx-background-color: #0d63bf;
     -fx-text-fill: white;
 }
+
+.switch-container {
+    -fx-padding: 10px 0px;
+    -fx-spacing: 10px;
+}
+
+.switch-label {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.status-label {
+    -fx-text-fill: #bbbbbb;
+    -fx-font-size: 14px;
+    -fx-font-style: italic;
+}
+
+.switch {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.switch .box {
+    -fx-background-color: #4a4a4a;
+    -fx-background-radius: 15px;
+    -fx-padding: 2px;
+    -fx-pref-width: 50px;
+    -fx-pref-height: 25px;
+    -fx-border-radius: 15px;
+    -fx-border-color: #666666;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 3, 0, 1, 1);
+}
+
+.switch:selected .box {
+    -fx-background-color: #4CAF50;
+    -fx-border-color: #45a049;
+}
+
+.switch .mark {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12px;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 2, 0, 1, 1);
+    -fx-translate-x: 0;
+}
+
+.switch:selected .mark {
+    -fx-translate-x: 25px;
+}
+
+.switch:hover .box {
+    -fx-background-color: #555555;
+}
+
+.switch:selected:hover .box {
+    -fx-background-color: #5cbf60;
+}

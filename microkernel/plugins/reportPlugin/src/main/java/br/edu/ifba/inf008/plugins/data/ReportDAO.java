@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ReportDAO {
     List<Loan> getActiveLoans() throws SQLException;
+    List<Loan> getReturnedLoans() throws SQLException;
 } 
