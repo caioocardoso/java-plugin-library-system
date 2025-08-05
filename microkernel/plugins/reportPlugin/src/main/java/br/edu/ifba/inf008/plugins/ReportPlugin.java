@@ -60,7 +60,6 @@ public class ReportPlugin implements IPlugin {
     private VBox createReportPane() {
         setupTableColumns();
 
-        // Create a nice switch with label
         Label switchLabel = new Label("Active Loans:");
         switchLabel.getStyleClass().add("switch-label");
         
@@ -72,21 +71,17 @@ public class ReportPlugin implements IPlugin {
         });
         activeLoansSwitch.getStyleClass().add("switch");
 
-        HBox switchContainer = new HBox(10, switchLabel, activeLoansSwitch);
-        switchContainer.setAlignment(Pos.CENTER_LEFT);
-        switchContainer.getStyleClass().add("switch-container");
-
-        statusLabel = new Label("Showing: Active Loans");
-        statusLabel.getStyleClass().add("status-label");
-
         Button refreshButton = new Button("Refresh");
         refreshButton.setOnAction(e -> loadReportData());
         refreshButton.getStyleClass().add("button");
 
-        HBox controlPanel = new HBox(15, switchContainer, refreshButton);
-        controlPanel.setAlignment(Pos.CENTER_LEFT);
+        HBox topBar = new HBox(10, switchLabel, activeLoansSwitch, refreshButton);
+        topBar.setAlignment(Pos.CENTER_LEFT);
 
-        VBox mainPane = new VBox(15, reportTable, controlPanel, statusLabel);
+        statusLabel = new Label("Showing: Active Loans");
+        statusLabel.getStyleClass().add("status-label");
+
+        VBox mainPane = new VBox(15, topBar, reportTable, statusLabel);
         mainPane.setPadding(new Insets(20));
         VBox.setVgrow(reportTable, Priority.ALWAYS);
         return mainPane;
