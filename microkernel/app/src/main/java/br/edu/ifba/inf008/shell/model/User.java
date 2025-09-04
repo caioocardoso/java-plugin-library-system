@@ -37,6 +37,10 @@ public class User {
         this.registeredAt = registeredAt;
     }
 
+    public LocalDateTime getRegisteredAt() {
+        return registeredAt;
+    }
+
     @Override
     public String toString() {
         return this.name;
